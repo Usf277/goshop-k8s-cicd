@@ -1,0 +1,125 @@
+name: CI/CD Pipeline for GoShop
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  test-backend:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run backend tests
+        run: echo "No backend tests implemented yet"
+
+  build-backend:
+    name: Build Backend Docker Image
+    runs-on: ubuntu-latest
+    needs: test-backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: usf277/goshop-backend:latest
+
+  deploy-backend:
+    name: Deploy Backend to Kubernetes
+    runs-on: ubuntu-latest
+    needs: build-backend
+    steps:
+      - name: Set up Kubeconfig
+        run: echo "$KUBECONFIG_CONTENT" > kubeconfig && export KUBECONFIG=$PWD/kubeconfig
+        env:
+          KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG }}
+
+      - name: Apply backend manifest
+        run: kubectl apply -f k8s/backend.yaml
+
+  test-frontend:
+    name: Test Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run frontend tests
+        run: echo "No frontend tests implemented yet"
+
+  build-frontend:
+    name: Build Frontend Docker Image
+    runs-on: ubuntu-latest
+    needs: test-frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: usf277/goshop-frontend:latest
+
+  deploy-frontend:
+    name: Deploy Frontend to Kubernetes
+    runs-on: ubuntu-latest
+    needs: build-frontend
+    steps:
+      - name: Set up Kubeconfig
+        run: echo "$KUBECONFIG_CONTENT" > kubeconfig && export KUBECONFIG=$PWD/kubeconfig
+        env:
+          KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG }}
+
+      - name: Apply frontend manifest
+        run: kubectl apply -f k8s/frontend.yaml
