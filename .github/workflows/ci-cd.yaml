@@ -55,7 +55,7 @@ jobs:
 
   deploy-backend:
     name: Deploy Backend to Kubernetes
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build-backend
     steps:
       - name: Set up Kubeconfig
@@ -113,7 +113,7 @@ jobs:
 
   deploy-frontend:
     name: Deploy Frontend to Kubernetes
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build-frontend
     steps:
       - name: Set up Kubeconfig
