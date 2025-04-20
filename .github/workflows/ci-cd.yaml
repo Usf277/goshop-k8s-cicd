@@ -64,7 +64,7 @@ jobs:
           KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG }}
 
       - name: Apply backend manifest
-        run: kubectl apply -f k8s/backend.yaml
+        run: kubectl apply -f k8s/
 
   test-frontend:
     name: Test Frontend
@@ -122,4 +122,4 @@ jobs:
           KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG }}
 
       - name: Apply frontend manifest
-        run: kubectl apply -f k8s/frontend.yaml
+        run: kubectl apply -f k8s/
