@@ -58,6 +58,9 @@ jobs:
     runs-on: self-hosted
     needs: build-backend
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Set up Kubeconfig
         run: echo "$KUBECONFIG_CONTENT" > kubeconfig && export KUBECONFIG=$PWD/kubeconfig
         env:
@@ -116,6 +119,9 @@ jobs:
     runs-on: self-hosted
     needs: build-frontend
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Set up Kubeconfig
         run: echo "$KUBECONFIG_CONTENT" > kubeconfig && export KUBECONFIG=$PWD/kubeconfig
         env:
