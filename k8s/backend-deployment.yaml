@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: usf277/goshop-backend:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              value: mysql://goshopuser:goshoppass@mysql:3306/goshop
+            - name: CLOUDINARY_CLOUD_NAME
+              value: dummy
+            - name: CLOUDINARY_API_KEY
+              value: dummy
+            - name: CLOUDINARY_API_SECRET
+              value: dummy
+            - name: STRIPE_SECRET_KEY
+              value: dummy
+            - name: STRIPE_WEBHOOK_SECRET
+              value: dummy
+            - name: FRONTEND_URL
+              value: http://localhost:5173
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
