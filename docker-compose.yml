@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: goshop
+      MYSQL_USER: goshopuser
+      MYSQL_PASSWORD: goshoppass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - goshop-net
+
+  backend:
+    build:
+      context: ./backend
+    container_name: goshop-backend
+    environment:
+      DATABASE_URL: mysql://goshopuser:goshoppass@mysql:3306/goshop
+      STRIPE_SECRET_KEY: "your_stripe_secret"
+      CLOUDINARY_CLOUD_NAME: "your_cloud"
+      CLOUDINARY_API_KEY: "your_key"
+      CLOUDINARY_API_SECRET: "your_secret"
+      FIREBASE_API_KEY: "your_key"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    networks:
+      - goshop-net
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: goshop-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - goshop-net
+
+volumes:
+  mysql-data:
+
+networks:
+  goshop-net:
+    driver: bridge

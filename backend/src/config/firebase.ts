@@ -1,23 +1,32 @@
-import admin from "firebase-admin";
-import serviceAccount from "./serviceAccountKey.json";
+// src/config/firebase.ts
 
-const params = {
-    type: serviceAccount.type,
-    projectId: serviceAccount.project_id,
-    privateKeyId: serviceAccount.private_key_id,
-    privateKey: serviceAccount.private_key,
-    clientEmail: serviceAccount.client_email,
-    clientId: serviceAccount.client_id,
-    authUri: serviceAccount.auth_uri,
-    tokenUri: serviceAccount.token_uri,
-    authProviderX509CertUrl: serviceAccount.auth_provider_x509_cert_url,
-    clientC509CertUrl: serviceAccount.client_x509_cert_url
+export const firebaseAdmin = null;
+export const storage = null;
+
+export const auth = {
+    verifyIdToken: async (_token: string) => {
+        return {
+            uid: "mock-uid",
+            role: "USER" as "USER"
+        };
+    },
+
+    createUser: async (_data: any) => {
+        return {
+            uid: "mock-uid",
+            email: _data?.email || "mock@example.com"
+        };
+    },
+    createCustomToken: async (_uid: string) => {
+        return "mock-custom-token";
+    },
+    setCustomUserClaims: async (_uid: string, _claims: any) => {
+        return;
+    },
+    updateUser: async (_uid: string, _data: any) => {
+        return {
+            uid: _uid,
+            ..._data
+        };
+    }
 };
-
-export const firebaseAdmin = admin.initializeApp({
-    credential: admin.credential.cert(params),
-    storageBucket: process.env.FIREBASE_BUCKET_URL
-});
-
-export const storage = firebaseAdmin.storage();
-export const auth = firebaseAdmin.auth();
